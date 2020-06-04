@@ -4,11 +4,11 @@ provider:
   name: aws
   runtime: python3.8
   environment:
-    TODO_TABLE: ${self:service}
+    TODO_TABLE: ${self:service}-table
 functions:
-  helloWorld:
-    handler: todo.get
+  get_all_todos:
+    handler: todos.get_all
     events:
       - httpApi:
             method: GET
-            path: /todo
+            path: /todos
