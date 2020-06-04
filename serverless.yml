@@ -1,9 +1,10 @@
-service: http-api-service
+service: todo-serverless
 
 provider:
   name: aws
   runtime: python3.8
-
+  environment:
+    TODO_TABLE: ${self:service}
 functions:
   helloWorld:
     handler: todo.get
