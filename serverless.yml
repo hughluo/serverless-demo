@@ -1,10 +1,25 @@
 service: todo-serverless
 
+custom:
+  tableName: ${self:service}-table 
+
 provider:
   name: aws
   runtime: python3.8
   environment:
-    TODO_TABLE: ${self:service}-table
+    TODO_TABLE: ${self:custom.tableName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
+
 functions:
   get_all_todos:
     handler: todos.get_all
@@ -12,3 +27,21 @@ functions:
       - httpApi:
             method: GET
             path: /todos
+
+resources:
+  Resources:
+    UsersDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: todoId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: todoId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
