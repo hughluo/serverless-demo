@@ -5,6 +5,7 @@ custom:
 
 provider:
   name: aws
+  region: eu-central-1
   runtime: python3.8
   environment:
     TODO_TABLE: ${self:custom.tableName}
