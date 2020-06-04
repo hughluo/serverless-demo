@@ -1,0 +1,13 @@
+service: http-api-service
+
+provider:
+  name: aws
+  runtime: python3.8
+
+functions:
+  helloWorld:
+    handler: todo.get
+    events:
+      - httpApi:
+            method: GET
+            path: /todo
