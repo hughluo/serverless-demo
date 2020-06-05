@@ -9,6 +9,7 @@ provider:
   name: aws
   region: eu-central-1
   runtime: python3.8
+  timeout: 25
   environment:
     TODO_TABLE: ${self:custom.tableName}
   iamRoleStatements:
@@ -26,6 +27,7 @@ provider:
 functions:
   create_todo:
     handler: todos.create
+    timeout: 25
     events:
       - httpApi:
             method: POST
@@ -33,10 +35,19 @@ functions:
 
   get_all_todos:
     handler: todos.get_all
+    timeout: 25
     events:
       - httpApi:
             method: GET
             path: /todos
+
+  get_todo_by_id:
+    handler: todos.get_by_id
+    timeout: 25
+    events:
+      - httpApi:
+            method: GET
+            path: /todos/{param}
 
 resources:
   Resources:
