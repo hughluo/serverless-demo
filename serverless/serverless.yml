@@ -1,3 +1,5 @@
+org: hughluo
+app: demo
 service: todo-serverless
 
 custom:
