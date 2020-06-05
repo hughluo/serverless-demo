@@ -22,6 +22,13 @@ provider:
         - { "Fn::GetAtt": ["UsersDynamoDBTable", "Arn" ] }
 
 functions:
+  create_todo:
+    handler: todos.create
+    events:
+      - httpApi:
+            method: POST
+            path: /todos
+
   get_all_todos:
     handler: todos.get_all
     events:
