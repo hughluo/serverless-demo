@@ -2,18 +2,24 @@ import json
 import os
 import boto3
 import uuid
+import base64
 
 table_name = os.environ['TODO_TABLE']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(table_name)
 
 def create(event, context):
-    if 'content' not in event['body']:
+    body_base64 = event['body']
+    body_str = base64.b64decode(body_base64).decode("utf-8")
+    body_str_split = body_str.split('content=')
+
+    if len(body_str_split) != 2:    # there is no 'content=<some content>' in body
         return {
             "statusCode": 400,
-            "body": f"must contain 'content' in request",
+            "body": f"must contain 'content' in request body",
         }
-    content = event['body']['content']
+
+    content = body_str_split[1]
     table.put_item(
         Item={
                 'todoId': uuid.uuid1().hex,
