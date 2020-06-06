@@ -51,6 +51,14 @@ functions:
             method: GET
             path: /todos/{param}
 
+  delete_todo_by_id:
+    handler: todos.delete_by_id
+    timeout: 25
+    events:
+      - httpApi:
+            method: DELETE
+            path: /todos/{param}
+            
 resources:
   Resources:
     UsersDynamoDBTable:

@@ -3,6 +3,8 @@ import os
 import boto3
 import uuid
 import base64
+from botocore.exceptions import ClientError
+
 
 table_name = os.environ['TODO_TABLE']
 dynamodb = boto3.resource('dynamodb')
@@ -46,7 +48,7 @@ def get_by_id(event, context):
     if 'param' not in event['pathParameters']:
         return {
             "statusCode": 400,
-            "body": f"must contain 'content' in request",
+            "body": f"must contain todoId in url",
         }
 
     todoId = event['pathParameters']['param']
@@ -68,3 +70,47 @@ def get_by_id(event, context):
         "statusCode": 200,
         "body": json.dumps(item),
     }
+
+
+def delete_by_id(event, context):
+    if 'param' not in event['pathParameters']:
+        return {
+            "statusCode": 400,
+            "body": f"must contain todoId in url",
+        }
+
+    todoId = event['pathParameters']['param']
+    try:
+        table.delete_item(
+            Key={
+                'todoId': todoId,
+            },
+            ConditionExpression=f"attribute_exists(todoId)",
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == "ConditionalCheckFailedException":
+            return {
+                "statusCode": 404,
+                "body": f"todoId '{todoId}' not found",
+            }
+        else:
+            raise
+    else:
+        return __ok("success")
+
+
+def __ok(msg):
+    return {
+        "statusCode": 200,
+        "body": msg,
+    }
+
+
+def __id_exists(todoId):
+    response = table.get_item(
+        Key={
+            'todoId': todoId,
+        }
+    )
+
+    return 'Item' in response
